@@ -651,7 +651,6 @@
         self.bind(transitionEnd, cb);
       } else {
         // Fallback to timers if the 'transitionend' event isn't supported.
-        console.log('SET TIMEOUT =', i);
         timeout = window.setTimeout(cb, i);
       }
 
@@ -691,7 +690,6 @@
     } else if(timeout !== null) {
       window.clearTimeout(timeout);
       timeout = null;
-      console.log('CLEAR TIMEOUT');
     }
 
     return this;
