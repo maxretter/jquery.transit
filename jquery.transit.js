@@ -641,6 +641,8 @@
 
         if (i > 0) {
           self.each(function() {
+            //console.log('DONE=' + $(this).data(dataNames.timeout));
+            $(this).removeData(dataNames.timeout);
             this.style[support.transition] = (oldTransitions[this] || null);
           });
         }
@@ -657,7 +659,8 @@
         // Fallback to timers if the 'transitionend' event isn't supported.
         var timeout = window.setTimeout(cb, i);
         self.each(function() {
-          this.data(dataNames.timeout, timeout);
+          $(this).data(dataNames.timeout, timeout);
+          //console.log('SET=' + timeout);
         });
       }
 
@@ -685,17 +688,20 @@
   };
 
   $.fn.stopTransition = function() {
+    var self = this;
     this.stop(true, true);
 
     this.each(function() {
       this.style[support.transition] = null;
 
-      var timeout = this.data(dataNames.timeout);
+      var timeout = $(this).data(dataNames.timeout);
+      $(this).removeData(dataNames.timeout);
 
       if(typeof timeout !== 'undefined') {
         window.clearTimeout(timeout);
+        //console.log('CLEAR=' + timeout);
       } else {
-        this.unbind(transitionEnd);
+        $(this).unbind(transitionEnd);
       }
     });
 
