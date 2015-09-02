@@ -46,8 +46,6 @@
 
   var div = document.createElement('div');
   var support = {};
-  var bound = false;
-  var timeout = null;
 
   // Helper function to get the proper vendor property name.
   // (`transition` => `WebkitTransition`)
@@ -88,6 +86,10 @@
     'OTransition':      'oTransitionEnd',
     'WebkitTransition': 'webkitTransitionEnd',
     'msTransition':     'MSTransitionEnd'
+  };
+
+  var dataNames = {
+    'timeout': 'transit-timeout',
   };
 
   // Detect the 'transitionend' event needed.
@@ -631,6 +633,8 @@
     var oldTransitions = {};
 
     var run = function(nextCall) {
+      var bound = false;
+
       // Prepare the callback.
       var cb = function() {
         if (bound) { self.unbind(transitionEnd, cb); }
@@ -651,7 +655,10 @@
         self.bind(transitionEnd, cb);
       } else {
         // Fallback to timers if the 'transitionend' event isn't supported.
-        timeout = window.setTimeout(cb, i);
+        var timeout = window.setTimeout(cb, i);
+        self.each(function() {
+          this.data(dataNames.timeout, timeout);
+        });
       }
 
       // Apply transitions.
@@ -682,15 +689,15 @@
 
     this.each(function() {
       this.style[support.transition] = null;
-    });
 
-    if ((transitionEnd) && ($.transit.useTransitionEnd)) {
-      bound = false;
-      this.unbind(transitionEnd, cb);
-    } else if(timeout !== null) {
-      window.clearTimeout(timeout);
-      timeout = null;
-    }
+      var timeout = this.data(dataNames.timeout);
+
+      if(typeof timeout !== 'undefined') {
+        window.clearTimeout(timeout);
+      } else {
+        this.unbind(transitionEnd);
+      }
+    });
 
     return this;
   };
